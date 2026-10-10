@@ -1,0 +1,11 @@
+# --- ~/.zsh_completions ---
+
+# Explicitly load the interactive menu module 
+zmodload zsh/complist
+
+# Force the menu to be interactive and highlight your selection
+zstyle ':completion:*' menu select=1
+
+# Tell Zsh how to behave when you hit Tab
+setopt AUTO_MENU         
+setopt ALWAYS_TO_END     

@@ -1,0 +1,11 @@
+[user]
+	name = Vatsal Chaudhari
+	email = vatsalchaudhari5@gmail.com
+[core]
+	autocrlf = input
+[diff]
+	tool = nvimdiff
+[difftool "nvimdiff"]
+	cmd = nvim -d \"$LOCAL\" \"$REMOTE\"
+[difftool]
+	prompt = false

@@ -1,0 +1,237 @@
+#downlad insta videos
+insta(){
+    link="$1"
+    cookie="$2"
+    if [ -z "$cookie" ]; then
+        command yt-dlp -f "bv*+ba/b" --merge-output-format mp4 "$link"
+    else
+        command yt-dlp --cookies-from-browser "$cookie" -f "bv*+ba/b" --merge-output-format mp4 "$link"
+    fi
+
+    
+#    if 
+
+
+}
+
+#imsg shortcut
+snd() {
+    first="$1"
+    message="$2"
+
+    if [ -z "$first" ]; then
+        echo "name not provided"
+        return 1
+    elif [ -z "$message" ]; then
+        echo "message not provided"
+        return 1
+    fi
+
+    matches=$(osascript <<EOF
+tell application "Contacts"
+    set matches to (every person whose first name is "$first")
+    set output to ""
+    repeat with p in matches
+        set output to output & (first name of p) & " " & (last name of p) & "\n"
+    end repeat
+    return output
+end tell
+EOF
+)
+    echo "match found: $matches" 
+    if [ -z "$matches" ]; then
+        echo "no contact found for '$first'"
+        return 1
+    fi
+
+    # count number of matches
+    count=$(echo "$matches" | grep -c .)
+
+    if [ "$count" -eq 1 ]; then
+        name="$matches"
+    else
+        echo "multiple matches found:"
+        i=1
+        while IFS= read -r line; do
+            echo "$i) $line"
+            i=$((i+1))
+        done <<< "$matches"
+
+        read "choice?pick a number: "
+        name=$(echo "$matches" | sed -n "${choice}p")
+    fi
+
+    command imsg send --to "$name" --text "$message"
+}
+
+# Check updates simultaneously
+updateall() {
+    echo "=== Homebrew ===" && brew outdated && \
+    echo "\n=== Python (pip – current venv) ===" && pip list --outdated 2>/dev/null || echo "No venv / pip not active" && \
+    echo "\n=== LaTeX (tlmgr) ===" && tlmgr update --list 2>/dev/null || echo "tlmgr not available" && \
+    echo "\n=== Git ===" && brew outdated git
+}
+
+# Open a specific Apple Note
+note() {
+    local note_title="$1"
+
+    if [[ -z "$note_title" ]]; then
+        echo "Usage: note <note title>"
+        return 1
+    fi
+
+    osascript <<EOF
+tell application "Notes"
+    set foundNotes to notes whose name is "$note_title"
+    if (count of foundNotes) > 0 then
+        show first item of foundNotes
+    else
+        display alert "Note not found: $note_title"
+    end if
+end tell
+EOF
+}
+
+# sauce
+sauce() {
+    local folder="$HOME/sauce"
+
+    case "$1" in
+        "")
+            cd "$folder" || { echo "Folder not found: $folder"; return 1; }
+            ;;
+        open)
+            open "$folder"
+            ;;
+        *)
+            echo "Unknown command: $1"
+            ;;
+    esac
+}
+
+# yt-dlp helper
+phdl() {
+  yt-dlp \
+    --cookies-from-browser chrome \
+    -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" \
+    --merge-output-format mp4 \
+    -o "$HOME/Downloads/%(title)s.%(ext)s" \
+    "$1"
+}
+
+# ffmpeg enhance helper
+enhance() {
+  ffmpeg -i "$1" \
+    -vf "hqdn3d=1.5:1.5:6:6,eq=contrast=1.08:brightness=0.01:saturation=1.07,unsharp=7:7:0.7" \
+    -c:v h264_videotoolbox \
+    -b:v 10M \
+    -c:a copy "${2:-output_topgear_style.mp4}"
+}
+
+# ta
+ta() {
+    local folder="$HOME/uni/ta"
+
+    case "$1" in
+        "")
+            cd "$folder" || { echo "Folder not found: $folder"; return 1; }
+            ;;
+        open)
+            open "$folder"
+            ;;
+        log)
+            cd "$HOME/uni/ta/payments/scripts/tracker" && python3 "$HOME/uni/ta/payments/scripts/tracker/tracker.py"
+            ;;
+        *)
+            echo "Unknown command: $1"
+            ;;
+    esac
+}
+
+# zsh config switchers
+use_ohmyzsh() {
+    cp ~/.zshrc.ohmyzsh ~/.zshrc
+    exec zsh
+}
+
+use_default() {
+    cp ~/.zshrc.pre-oh-my-zsh ~/.zshrc
+    exec zsh
+}
+
+# loader function
+ss() {
+    local mode="$1"
+
+    case "$mode" in
+        ohmyzsh)
+            source "$HOME/.zshrc.ohmyzsh"
+            echo "Switched to Oh My Zsh"
+            ;;
+        default)
+            source "$HOME/.zshrc.pre-oh-my-zsh"
+            echo "Switched to default zsh"
+            ;;
+        *)
+            echo "Usage: switch_zsh [ohmyzsh|default]"
+            ;;
+    esac
+}
+# Dissertation helper
+diss() {
+  local folder="$HOME/uni/dissertation"
+
+  case "$1" in
+    inter)
+      open "$HOME/uni/dissertation/vrc4/vrc4_interim_report..pdf"
+      ;;
+    prel)
+      open "$HOME/uni/dissertation/vrc4/preliminary-report/vrc4_preliminary_report.pdf"
+      ;;
+    info)
+      open "$HOME/uni/dissertation/info/study-guide.pdf"
+      ;;
+    des)
+      open "$HOME/uni/dissertation/select/got/GECCO 2024 Space Optimisation Competition (SPoC).pdf"
+      ;;
+    open)
+      open "$HOME/uni/dissertation"
+      ;;
+    web)
+      open "https://campus.cs.le.ac.uk/gitlab/pgt_project/25_26_spring/vrc4"
+      ;;
+    code)
+      nvim "$folder/vrc4"
+      ;;
+    pull)
+      cd "$folder/vrc4" && git pull
+      ;;
+    help|--help|-h)
+      echo "Usage: diss [command]"
+      echo "Commands:"
+      echo "  main  - go to main working directory"
+      echo "  web   - open GitLab project page"
+      echo "  code  - open project in fresh text editor"
+      echo "  pull  - git pull in folder"
+      echo "  help  - show this message"
+      echo "  des   - open the description of the dissertation"
+      echo "  info  - open study guide"
+      echo "  prel  - open preliminary report"
+      echo "  inter - open interim report"
+      ;;
+    "")
+      cd "$folder/vrc4"
+      ;;
+    *)
+      echo "Unknown command: $1"
+      echo "Try 'diss help'"
+      ;;
+  esac
+}
+
+# alias finder
+
+aliasgrep() {
+  alias | grep "$*"
+}

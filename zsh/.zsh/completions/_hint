@@ -1,0 +1,26 @@
+#compdef hint
+
+_hint() {
+    local tool_dir="$HOME/.hint/content"
+    local -a tools topics
+
+    # SCENARIO 1: The user hit TAB after typing `hint ` (Looking for the tool)
+    if (( CURRENT == 2 )); then
+        # Grab all directories inside the content folder
+        # (/N:t) is Zsh magic: (/) directories only, (N) ignore if empty, (:t) get folder name only
+        tools=(${tool_dir}/*(/N:t))
+        _describe 'tools' tools
+        
+    # SCENARIO 2: The user hit TAB after typing `hint nvim ` (Looking for the topic)
+    elif (( CURRENT == 3 )); then
+        # Identify which tool they typed in the previous word
+        local selected_tool="${words[2]}"
+        
+        # Grab all .md files inside that specific tool's folder
+        # (:r) is Zsh magic: removes the .md extension so it just suggests "search" instead of "search.md"
+        topics=(${tool_dir}/${selected_tool}/*.md(N:t:r))
+        _describe 'topics' topics
+    fi
+}
+
+_hint

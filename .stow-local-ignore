@@ -1,0 +1,6 @@
+\.git
+\.gitignore
+\.zsh_history
+\.zsh_sessions
+\.zshrc\.old
+\.DS_Store
