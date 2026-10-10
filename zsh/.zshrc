@@ -79,7 +79,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git web-search alias-finder fzf)
 
-source ~/dotfiles/zsh/.zsh_env
+source ~/.dotfiles/zsh/.zsh_env
 source $ZSH/oh-my-zsh.sh
 
 eval "$(pyenv init -)"
@@ -112,9 +112,9 @@ eval "$(pyenv init -)"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-source ~/dotfiles/zsh/.zsh_completions
-source ~/dotfiles/zsh/.zsh_aliases
-source ~/dotfiles/zsh/.zsh_functions
+source ~/.dotfiles/zsh/.zsh_completions
+source ~/.dotfiles/zsh/.zsh_aliases
+source ~/.dotfiles/zsh/.zsh_functions
 
 eval "$(zoxide init --cmd cd zsh)"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.

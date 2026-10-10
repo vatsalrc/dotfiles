@@ -1,3 +1,9 @@
+if [[ "$OSTYPE" == darwin* ]]; then
+  alias copy="pbcopy"
+else
+  alias copy="xclip -selection clipboard"
+fi
+
 alias zshconfig="nvim ~/.zshrc"
 alias todo="glow $HOME/Documents/todo.md"
 alias tg="open 'https://www.bbc.co.uk/iplayer/episode/b00tbs3z/top-gear-series-15-episode-6?seriesId=b006mj59-structural-15-b00sym5n'"
